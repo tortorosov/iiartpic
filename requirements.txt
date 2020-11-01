@@ -52,7 +52,6 @@ Cython==0.29.14
 cytoolz==0.9.0.1
 dask==1.2.0
 dataclasses==0.7
-datashape==0.5.4
 DAWG-Python==0.7.2
 decorator==4.4.0
 defusedxml==0.6.0
