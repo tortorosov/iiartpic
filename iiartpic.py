@@ -1,48 +1,49 @@
 import streamlit as st
-import pandas as pd
-import altair as alt
+import numpy as np
 
-@st.cache
-def get_UN_data():
-    AWS_BUCKET_URL = "https://streamlit-demo-data.s3-us-west-2.amazonaws.com"
-    df = pd.read_csv(AWS_BUCKET_URL + "/agri.csv.gz")
-    return df.set_index("Region")
+# Interactive Streamlit elements, like these sliders, return their value.
+# This gives you an extremely simple interaction model.
+iterations = st.sidebar.slider("Level of detail", 2, 20, 10, 1)
+separation = st.sidebar.slider("Separation", 0.7, 2.0, 0.7885)
 
-try:
-    df = get_UN_data()
-except urllib.error.URLError as e:
-    st.error(
-        """
-        **This demo requires internet access.**
+# Non-interactive elements return a placeholder to their location
+# in the app. Here we're storing progress_bar to update it later.
+progress_bar = st.sidebar.progress(0)
 
-        Connection error: %s
-    """
-        % e.reason
-    )
-    #return
+# These two elements will be filled in later, so we create a placeholder
+# for them using st.empty()
+frame_text = st.sidebar.empty()
+image = st.empty()
 
-countries = st.multiselect(
-    "Choose countries", list(df.index), ["China", "United States of America"]
-)
-if not countries:
-    st.error("Please select at least one country.")
-    #return
+m, n, s = 960, 640, 400
+x = np.linspace(-m / s, m / s, num=m).reshape((1, m))
+y = np.linspace(-n / s, n / s, num=n).reshape((n, 1))
 
-data = df.loc[countries]
-data /= 1000000.0
-st.write("### Gross Agricu____ltural Production ($B)", data.sort_index())
+for frame_num, a in enumerate(np.linspace(0.0, 4 * np.pi, 100)):
+    # Here were setting value for these two elements.
+    progress_bar.progress(frame_num)
+    frame_text.text("Frame %i/100" % (frame_num + 1))
 
-data = data.T.reset_index()
-data = pd.melt(data, id_vars=["index"]).rename(
-    columns={"index": "year", "value": "Gross Agricultural Product ($B)"}
-)
-chart = (
-    alt.Chart(data)
-    .mark_area(opacity=0.3)
-    .encode(
-        x="year:T",
-        y=alt.Y("Gross Agricultural Product ($B):Q", stack=None),
-        color="Region:N",
-    )
-)
-st.altair_chart(chart, use_container_width=True)
+    # Performing some fractal wizardry.
+    c = separation * np.exp(1j * a)
+    Z = np.tile(x, (n, 1)) + 1j * np.tile(y, (1, m))
+    C = np.full((n, m), c)
+    M = np.full((n, m), True, dtype=bool)
+    N = np.zeros((n, m))
+
+    for i in range(iterations):
+        Z[M] = Z[M] * Z[M] + C[M]
+        M[np.abs(Z) > 2] = False
+        N[M] = i
+
+    # Update the image placeholder by calling the image() function on it.
+    image.image(1.0 - (N / N.max()), use_column_width=True)
+
+# We clear elements by calling empty on them.
+progress_bar.empty()
+frame_text.empty()
+
+# Streamlit widgets automatically run the script from top to bottom. Since
+# this button is not connected to any other logic, it just causes a plain
+# rerun.
+st.button("Re-run")
