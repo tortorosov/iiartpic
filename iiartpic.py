@@ -30,7 +30,7 @@ if not countries:
 
 data = df.loc[countries]
 data /= 1000000.0
-st.write("### Gross Agricultural Production ($B)", data.sort_index())
+st.write("### Gross Agricu___ltural Production ($B)", data.sort_index())
 
 data = data.T.reset_index()
 data = pd.melt(data, id_vars=["index"]).rename(
