@@ -25,8 +25,6 @@ blinker==1.4
 blis==0.4.1
 bokeh==1.1.0
 boto==2.49.0
-boto3 @ file:///home/conda/feedstock_root/build_artifacts/boto3_1588803661435/work
-botocore @ file:///home/conda/feedstock_root/build_artifacts/botocore_1588800754383/work
 Bottleneck==1.2.1
 branca==0.3.1
 bz2file==0.98
