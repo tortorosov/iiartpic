@@ -3,3 +3,4 @@ pandas==0.24.2
 altair==4.1.0
 tensorflow==2.0.0
 keras==2.2.5
+matplotlib
