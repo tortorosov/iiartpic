@@ -7,7 +7,10 @@ import matplotlib.pyplot as plt
 import streamlit as st
 from PIL import Image
 
-my_bar = st.progress(0)
+iterations = st.sidebar.slider("Level of detail", 2, 20, 10, 1)
+separation = st.sidebar.slider("Separation", 0.7, 2.0, 0.7885)
+
+my_bar = st.sidebar.progress(0)
 
 count_p = 0
 my_bar.progress(count_p *4)
@@ -324,6 +327,8 @@ plt.savefig("2.png")
 count_p +=1
 my_bar.progress(count_p *4)
 
+my_bar.empty()
+
 #st.write(count_p)
 
 #with st.spinner('Wait for it...'):
@@ -334,8 +339,6 @@ image = Image.open('2.png')
 #st.image(image, caption='Sunrise by the mountains', use_column_width=True)
 st.image(image, use_column_width=True)
 st.balloons()
-
-
 
 #import tkinter
 #import matplotlib
