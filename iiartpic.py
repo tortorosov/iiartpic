@@ -1,4 +1,5 @@
 import streamlit as st
+
 import numpy as np
 import tensorflow as tf
 import tensorflow.keras.backend as K
@@ -14,7 +15,7 @@ iterations = st.sidebar.slider("Level of detail", 2, 20, 10, 1)
 separation = st.sidebar.slider("Separation", 0.7, 2.0, 0.7885)
 
 
-NBATCH = 250  # size of mini-batch
+NBATCH = 40  # size of mini-batch
 #NBATCH = 500  # size of mini-batch
 #NX = 28  # image width
 #NY = 28  # image height
@@ -22,14 +23,14 @@ NX = 16  # image width
 NY = 16  # image height
 NC = 1   # number of channels (1=monochrome)
 NZ = 32  # VAE: size of latent variable
-SCALE = 6  # CPPN: zooming scale
+SCALE = 3  # CPPN: zooming scale
 
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 
-x_train = np.random.rand(60000,NX,NY)
-y_train = np.random.rand(60000,)
-x_test = np.random.rand(10000,NX,NY)
-y_test = np.random.rand(10000,)
+x_train = np.random.rand(6000,NX,NY)
+y_train = np.random.rand(6000,)
+x_test = np.random.rand(1000,NX,NY)
+y_test = np.random.rand(1000,)
 
 x_train = x_train.reshape(-1, NY, NX, NC).astype(np.float32) / 255.0
 x_test = x_test.reshape(-1, NY, NX, NC).astype(np.float32) / 255.0
@@ -39,7 +40,7 @@ x_batches = tf.data.Dataset.from_tensor_slices(x_train).shuffle(NSAMPLE).batch(N
 #print(x_train.shape, x_test.shape)
 
 
-@st.cache(persist=True)
+@st.cache
 def create_coordinates(nx=NX, ny=NY, scale=SCALE, nbatch=NBATCH):
   n = (nx + ny) / 2
   nx2, ny2 = nx/n*scale, ny/n*scale
@@ -58,7 +59,7 @@ coords_sample, _, _, _ = create_coordinates(nbatch=5)
 
 #print(coords.shape)
 
-@st.cache(hash_funcs={tf.keras.Sequential: id}, persist=True)
+@st.cache(hash_funcs={tf.keras.Sequential: id})
 def model_vae_encoder(name='VAE-Q', nodes=32):
   return tf.keras.Sequential([
       layers.InputLayer(input_shape=(NY, NX, NC)),
@@ -76,7 +77,7 @@ def sample_func(z_params, mean=0, stddev=1):
   eps = tf.random.normal(shape=tf.shape(z_mean), mean=mean, stddev=stddev)
   return z_mean + tf.exp(z_logvar * 0.5) * eps
 
-@st.cache(persist=True)
+@st.cache
 def sample(z_params, mean=0, stddev=1):
   return layers.Lambda(sample_func)(z_params)
 
@@ -85,8 +86,8 @@ def repeat_vector(inputs):
   vec_in, dim_in = inputs
   return layers.RepeatVector(K.shape(dim_in)[1])(vec_in)
 
-@st.cache(persist=True)
-def model_cppn_generator(name='CPPN-G', levels=4, nodes=32, stddev=1):
+@st.cache
+def model_cppn_generator(name='CPPN-G', levels=3, nodes=32, stddev=1):
   normal_init = tf.keras.initializers.RandomNormal(stddev=stddev)
   inits = {'kernel_initializer':normal_init, 'bias_initializer':normal_init}
 
@@ -101,7 +102,7 @@ def model_cppn_generator(name='CPPN-G', levels=4, nodes=32, stddev=1):
   x_out = layers.Flatten()(h)
   return tf.keras.Model(inputs=[z_in, coord_in], outputs=x_out, name=name)
 
-@st.cache(persist=True)
+@st.cache
 def sq(x, nx=NX, ny=NY, nc=NC):
   return tf.reshape(x, (-1, ny, nx, nc))
 
@@ -120,18 +121,18 @@ def model_dcgan_discriminator(name='DCGAN-D', filters=32, stddev=0.02):
   model.add(layers.Dense(1, **inits))  # no need activation='sigmoid' if using binary_crossentropy(from_logits=True) -- https://stackoverflow.com/questions/45741878/using-binary-crossentropy-loss-in-keras-tensorflow-backend
   return model
 
-@st.cache(persist=True)
+@st.cache
 def kld(z_mean, z_logvar):
   return -0.5 * K.sum(1 + z_logvar - K.square(z_mean) - K.exp(z_logvar), axis=1) / (NX*NY*NC)
 
-@st.cache(persist=True)
+@st.cache
 def bce(y1, y2):
   y1_flat = tf.reshape(y1, (-1, NX*NY*NC))
   y2_flat = tf.reshape(y2, (-1, NX*NY*NC))
   return tf.keras.losses.binary_crossentropy(y1_flat, y2_flat)
 #   return -K.sum(y1_flat * K.log(1e-10 + y2_flat) + (1-y1_flat) * K.log(1e-10 + 1 - y2_flat), axis=1) / (NX*NY*NC)
 
-@st.cache(persist=True)
+@st.cache
 def bce_logits(b, y):
   truth = tf.ones_like(y) if b else tf.zeros_like(y)
   return tf.keras.losses.binary_crossentropy(truth, y, from_logits=True)
@@ -202,19 +203,7 @@ def train_batch_vaegan(x_batch, q_loop=1, g_loop=1,
   return q_loss, g_loss, d_loss, g_updated, d_updated
 
 
-#my_bar = st.sidebar.progress(0)
-
-#count_p = 0
-
-#count_p +=1
-#my_bar.progress(count_p *4)
-
-
-#st.write('Hello, *World!* :sunglasses:')
-
-
-
-XL = 50  # enlarge factor
+XL = 40  # enlarge factor
 #XL = 5  # enlarge factor
 POS = 183  # test data position
 #POS = 83  # test data position
@@ -243,16 +232,8 @@ elif choice in [3]:
 plt.axis('off')
 #plt.show()
 
-#plt.plot([1,2,3], [5,7,4])
 plt.savefig("2.png")
 
-#my_bar.empty()
-
-#st.write(count_p)
-
-#with st.spinner('Wait for it...'):
-#	time.sleep(5)
-#	st.success('Done!')
 
 image = Image.open('2.png')
 #st.image(image, caption='Sunrise by the mountains', use_column_width=True)
