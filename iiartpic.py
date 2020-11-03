@@ -1,7 +1,4 @@
 import streamlit as st
-
-st.cache(persist=False)
-
 import numpy as np
 import tensorflow as tf
 import tensorflow.keras.backend as K
@@ -42,7 +39,7 @@ x_batches = tf.data.Dataset.from_tensor_slices(x_train).shuffle(NSAMPLE).batch(N
 #print(x_train.shape, x_test.shape)
 
 
-@st.cache
+@st.cache(persist=True)
 def create_coordinates(nx=NX, ny=NY, scale=SCALE, nbatch=NBATCH):
   n = (nx + ny) / 2
   nx2, ny2 = nx/n*scale, ny/n*scale
@@ -61,7 +58,7 @@ coords_sample, _, _, _ = create_coordinates(nbatch=5)
 
 #print(coords.shape)
 
-@st.cache(hash_funcs={tf.keras.Sequential: id})
+@st.cache(hash_funcs={tf.keras.Sequential: id}, persist=True)
 def model_vae_encoder(name='VAE-Q', nodes=32):
   return tf.keras.Sequential([
       layers.InputLayer(input_shape=(NY, NX, NC)),
@@ -79,7 +76,7 @@ def sample_func(z_params, mean=0, stddev=1):
   eps = tf.random.normal(shape=tf.shape(z_mean), mean=mean, stddev=stddev)
   return z_mean + tf.exp(z_logvar * 0.5) * eps
 
-@st.cache
+@st.cache(persist=True)
 def sample(z_params, mean=0, stddev=1):
   return layers.Lambda(sample_func)(z_params)
 
@@ -88,7 +85,7 @@ def repeat_vector(inputs):
   vec_in, dim_in = inputs
   return layers.RepeatVector(K.shape(dim_in)[1])(vec_in)
 
-@st.cache
+@st.cache(persist=True)
 def model_cppn_generator(name='CPPN-G', levels=4, nodes=32, stddev=1):
   normal_init = tf.keras.initializers.RandomNormal(stddev=stddev)
   inits = {'kernel_initializer':normal_init, 'bias_initializer':normal_init}
@@ -104,7 +101,7 @@ def model_cppn_generator(name='CPPN-G', levels=4, nodes=32, stddev=1):
   x_out = layers.Flatten()(h)
   return tf.keras.Model(inputs=[z_in, coord_in], outputs=x_out, name=name)
 
-@st.cache
+@st.cache(persist=True)
 def sq(x, nx=NX, ny=NY, nc=NC):
   return tf.reshape(x, (-1, ny, nx, nc))
 
@@ -123,18 +120,18 @@ def model_dcgan_discriminator(name='DCGAN-D', filters=32, stddev=0.02):
   model.add(layers.Dense(1, **inits))  # no need activation='sigmoid' if using binary_crossentropy(from_logits=True) -- https://stackoverflow.com/questions/45741878/using-binary-crossentropy-loss-in-keras-tensorflow-backend
   return model
 
-@st.cache
+@st.cache(persist=True)
 def kld(z_mean, z_logvar):
   return -0.5 * K.sum(1 + z_logvar - K.square(z_mean) - K.exp(z_logvar), axis=1) / (NX*NY*NC)
 
-@st.cache
+@st.cache(persist=True)
 def bce(y1, y2):
   y1_flat = tf.reshape(y1, (-1, NX*NY*NC))
   y2_flat = tf.reshape(y2, (-1, NX*NY*NC))
   return tf.keras.losses.binary_crossentropy(y1_flat, y2_flat)
 #   return -K.sum(y1_flat * K.log(1e-10 + y2_flat) + (1-y1_flat) * K.log(1e-10 + 1 - y2_flat), axis=1) / (NX*NY*NC)
 
-@st.cache
+@st.cache(persist=True)
 def bce_logits(b, y):
   truth = tf.ones_like(y) if b else tf.zeros_like(y)
   return tf.keras.losses.binary_crossentropy(truth, y, from_logits=True)
