@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 
 from PIL import Image
 
+st.sidebar.title('iiartpic')
+st.title('iiartpic')
+
 iterations = st.sidebar.slider("Level of detail", 2, 20, 10, 1)
 separation = st.sidebar.slider("Separation", 0.7, 2.0, 0.7885)
 
@@ -155,7 +158,7 @@ all_d_loss = []
 
 def train_batch_vaegan(x_batch, q_loop=1, g_loop=1, 
                        g_always=True, d_always=True, th_high=0.75, th_low=0.6):
-  with tf.device('/gpu:0'):
+  with tf.device('/cpu:0'):
     g_updated = d_updated = False
     for i in range(q_loop):
       with tf.GradientTape() as vae_tape:
