@@ -2,12 +2,22 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-
+import requests
+from io import StringIO
 
 #st.title("Example Project")
 
-z_data = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/api_docs/mt_bruno_elevation.csv')
-#z_data = pd.read_csv('data.csv')
+orig_url='https://drive.google.com/file/d/1egRl_HPPxei4ZOrdOzhMKFiwizqZwkmz/view?usp=sharing'
+
+file_id = orig_url.split('/')[-2]
+dwn_url='https://drive.google.com/uc?export=download&id=' + file_id
+url = requests.get(dwn_url).text
+csv_raw = StringIO(url)
+
+z_data = pd.read_csv(csv_raw)
+
+#st.dataframe(z_data)
+
 z = z_data.values
 sh_0, sh_1 = z.shape
 x, y = np.linspace(0, 1, sh_0), np.linspace(0, 1, sh_1)
