@@ -36,13 +36,13 @@ fig.update_layout(title='Example Project', autosize=False,
 
 my_fig = st.plotly_chart(fig)
 
-while True:
-	x, y, z = get_data()
-	fig = go.Figure(data=[go.Surface(z=z, x=x, y=y)])
-	fig.update_layout(title='Example Project', autosize=False,
-					  width=800, height=800,
-					  margin=dict(l=40, r=40, b=40, t=40))
+# while True:
+	# x, y, z = get_data()
+	# fig = go.Figure(data=[go.Surface(z=z, x=x, y=y)])
+	# fig.update_layout(title='Example Project', autosize=False,
+					  # width=800, height=800,
+					  # margin=dict(l=40, r=40, b=40, t=40))
 
-	my_fig.plotly_chart(fig)
+	# my_fig.plotly_chart(fig)
 	
-	time.sleep(1.1)
+	# time.sleep(1.1)
