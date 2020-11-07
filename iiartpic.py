@@ -3,12 +3,18 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+import requests
+from io import StringIO
 
-csv_raw='C:\\Users\\Eugen\\iiartpic\\example.csv'
+orig_url='https://drive.google.com/file/d/1NrMfNIJpBbF5_yHp9bVIXLsWehYaoiM2/view?usp=sharing'
+file_id = orig_url.split('/')[-2]
+dwn_url='https://drive.google.com/uc?export=download&id=' + file_id
 
 def get_data():
+	url = requests.get(dwn_url).text
+	csv_raw = StringIO(url)
+	
 	z_data = pd.read_csv(csv_raw)
-
 	#st.dataframe(z_data)
 
 	z = z_data.values
