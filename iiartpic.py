@@ -44,7 +44,7 @@ fig.update_layout(title='Мои навыки в %', autosize=False,
 				  margin=dict(l=40, r=40, b=40, t=40)
 				  )
 
-fig = st.plotly_chart(fig)
+fig = st.plotly_chart(fig, use_container_width=True)
 
 link = 'Мои работы: https://sites.google.com/view/iiartpic'
 st.markdown(link, unsafe_allow_html=True)
