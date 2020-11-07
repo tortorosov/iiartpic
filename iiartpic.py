@@ -39,7 +39,7 @@ for i in range(sh_0):
 #fig.update_layout(barmode='stack')
 #fig.show()
 #fig.update_traces(showlegend=True, showscale=False)
-fig.update_layout(title='Мои навыки в %', autosize=True,
+fig.update_layout(title='Мои навыки в %', autosize=False,
 				  width=800, height=600,
 				  margin=dict(l=40, r=40, b=40, t=40)
 				  )
