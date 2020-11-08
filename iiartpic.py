@@ -29,24 +29,46 @@ sh_0, sh_1, z = get_data()
 #st.write(sh_1)
 #st.write(z)
 
-#x = ['ПОЛЬЗОВАТЕЛЬ', 'АДМИНИСТРИРОВАНИЕ', 'ПРОГРАММИРОВАНИЕ', 'УПРАВЛЕНИЕ']
-x = ['Пользователь', 'Администрирование', 'Программирование', 'Управление']
+x = ['Skills level']
 
 fig = go.Figure()
 for i in range(sh_0):
 	fig.add_trace(go.Bar(x = x, y = np.delete(z[i,], 0), name=z[i,0]))
 
 #fig.update_layout(barmode='stack')
+#fig.update_traces({staticPlot: true})
 #fig.show()
 #fig.update_traces(showlegend=True, showscale=False)
-fig.update_layout(title='Мои навыки в %', autosize=False,
-				  width=800, height=600,
-				  margin=dict(l=40, r=40, b=40, t=40)
-				  )
+#fig.update_layout(
+#				title='My skills', autosize=False,
+#				width=800, height=600,
+#				ticktext=["Competent", "Expert", "Master"],
+#						tickvals=[10, 20, 30],
+#						tickmode="array",
+#						titlefont=dict(size=30)
+				  #margin=dict(l=10, r=10, b=300, t=300)
+				  #margin=dict(l=10, r=20, t=20, b=100, pad=4),
+				  #paper_bgcolor="LightSteelBlue",
+#				  )
 
+fig.update_layout(
+	title='My skills', autosize=False,
+	width=800, height=600,
+    #margin=dict(l=10, r=20, t=20, b=100, pad=4),
+	yaxis=dict(
+        #title_text="Y-axis Title",
+        ticktext=["Competent", "Expert", "Master"],
+        tickvals=[10, 30, 80],
+        tickmode="array",
+        titlefont=dict(size=30),
+    )
+)
+
+
+fig.update_yaxes(automargin=True)
 fig = st.plotly_chart(fig, use_container_width=True)
 
-link = 'Мои работы: https://sites.google.com/view/iiartpic'
+link = 'My projects: https://sites.google.com/view/iiartpic'
 st.markdown(link, unsafe_allow_html=True)
 
 ################################
