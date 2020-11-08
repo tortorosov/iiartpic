@@ -42,7 +42,7 @@ sh_0, sh_1, z = get_data()
 
 fig = go.Figure()
 
-agree = st.checkbox('My skills legend On/Off (manual selection legend)', value=True)
+agree = st.checkbox('My skills legend all On/Off (manual selection legend)', value=True)
 if agree:
 	legend_on_off(z,sh_0)
 else:
