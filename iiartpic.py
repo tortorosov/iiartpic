@@ -23,17 +23,33 @@ def get_data():
 	
 	return sh_0, sh_1, z
 
+def legend_on_off(z,sh_0):
+	if agree:
+		fig.data = []
+		for i in range(sh_0):
+			fig.add_trace(go.Bar(x = ['Level'], y = np.delete(z[i,], 0), name=z[i,0]))
+	else:
+		fig.data = []
+		for i in range(sh_0):
+			fig.add_trace(go.Bar(x = ['Level'], y = np.delete(z[i,], 0), name=z[i,0], visible='legendonly'))
+
+
 sh_0, sh_1, z = get_data()
 
 #st.write(sh_0)
 #st.write(sh_1)
 #st.write(z)
 
-x = ['Skills level']
-
 fig = go.Figure()
-for i in range(sh_0):
-	fig.add_trace(go.Bar(x = x, y = np.delete(z[i,], 0), name=z[i,0]))
+
+agree = st.checkbox('My skills legend On/Off (manual selection legend)', value=True)
+if agree:
+	legend_on_off(z,sh_0)
+else:
+	legend_on_off(z,sh_0)
+
+#for i in range(sh_0):
+#	fig.add_trace(go.Bar(x = x, y = np.delete(z[i,], 0), name=z[i,0]))
 
 #fig.update_layout(barmode='stack')
 #fig.update_traces({staticPlot: true})
@@ -52,7 +68,8 @@ for i in range(sh_0):
 #				  )
 
 fig.update_layout(
-	title='My skills', autosize=False,
+	#title='My skills', autosize=False,
+	autosize=False,
 	width=800, height=600,
     #margin=dict(l=10, r=20, t=20, b=100, pad=4),
 	yaxis=dict(
@@ -66,10 +83,14 @@ fig.update_layout(
 
 
 fig.update_yaxes(automargin=True)
-fig = st.plotly_chart(fig, use_container_width=True)
+
+#fig = st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
+
 
 link = 'My projects: https://sites.google.com/view/iiartpic'
 st.markdown(link, unsafe_allow_html=True)
+
 
 ################################
 
