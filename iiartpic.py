@@ -27,11 +27,11 @@ def legend_on_off(z,sh_0):
 	if agree:
 		fig.data = []
 		for i in range(sh_0):
-			fig.add_trace(go.Bar(x = ['Level'], y = np.delete(z[i,], 0), name=z[i,0]))
+			fig.add_trace(go.Bar(x = ['Tools'], y = np.delete(z[i,], 0), name=z[i,0]))
 	else:
 		fig.data = []
 		for i in range(sh_0):
-			fig.add_trace(go.Bar(x = ['Level'], y = np.delete(z[i,], 0), name=z[i,0], visible='legendonly'))
+			fig.add_trace(go.Bar(x = ['Tools'], y = np.delete(z[i,], 0), name=z[i,0], visible='legendonly'))
 
 
 sh_0, sh_1, z = get_data()
